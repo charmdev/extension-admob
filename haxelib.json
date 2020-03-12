@@ -1,0 +1,13 @@
+{
+	"name": "extension-admob",
+	"url": "https://github.com/charmdev/extension-admob",
+	"license": "MIT",
+	"contributors":["charmdev"],
+	"tags": ["ads", "api", "google", "ad", "monetization", "admob"],
+	"description": "Google AdMob / OpenFL extension for Android + iOS.",
+	"version": "1.6.5",
+	"dependencies": {
+		"extension-googleplayservices-basement": ""
+	},
+	"releasenote": "first commit"
+}
