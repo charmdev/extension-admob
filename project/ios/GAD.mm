@@ -46,9 +46,19 @@ GADRequest *_admobexGetGADRequest(){
     if(!self) return nil;
     adId = ID;
     ad = [[GADRewardedAd alloc] initWithAdUnitID:ID];
-    GADRequest *request = _admobexGetGADRequest();
+   
     //GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[ kGADSimulatorID ];
 
+    [self loadRequest];
+
+    NSLog(@"AdMob Loading Rewarded");
+    reportRewardedEvent(ADMOB_LOADING, nil);
+    return self;
+}
+
+- (void)loadRequest{
+
+    GADRequest *request = _admobexGetGADRequest();
     [ad loadRequest:request completionHandler:^(GADRequestError * _Nullable error) {
         if (error) {
             NSLog(@"rewardedDidFailToReceiveAdWithError: %@", [error localizedDescription]);
@@ -58,9 +68,6 @@ GADRequest *_admobexGetGADRequest(){
             reportRewardedEvent(ADMOB_LOADED, nil);
         }
     }];
-    NSLog(@"AdMob Loading Rewarded");
-    reportRewardedEvent(ADMOB_LOADING, nil);
-    return self;
 }
 
 - (bool)isReady{
@@ -89,12 +96,16 @@ GADRequest *_admobexGetGADRequest(){
 - (void)rewardedAd:(GADRewardedAd *)rewardedAd didFailToPresentWithError:(NSError *)error {
     NSLog(@"rewardedDidFailToPresentWithError: %@", [error localizedDescription]);
     reportRewardedEvent(ADMOB_FAILED, nil);
+
+    [self initWithID:adId];
 }
 
 /// Tells the delegate that the rewarded ad was dismissed.
 - (void)rewardedAdDidDismiss:(GADRewardedAd *)rewardedAd {
     NSLog(@"rewardedDidDismiss");
     reportRewardedEvent(ADMOB_CLOSED, nil);
+
+    [self initWithID:adId];
 }
 
 @end
@@ -113,7 +124,6 @@ namespace admobex {
 			[rewardedIDs addObject:[NSString stringWithUTF8String:p.c_str()]];
 		}
 
-        GADRequest *request = _admobexGetGADRequest();
         //GADMobileAds.sharedInstance.requestConfiguration.testDeviceIdentifiers = @[ kGADSimulatorID ];
 		
         for(NSString* rewardedID in rewardedIDs){

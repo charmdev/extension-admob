@@ -25,10 +25,18 @@ class AdMob {
 	private static var skipCB;
 	private static var rewardFlag:Bool;
 	private static var _rewardedId:String;
+	private static var canshow:Bool = false;
+
+	public static function canShowAds():Bool {
+		trace("admob canShowAds", canshow);
+		return canshow;
+	}
 
 	public static function showRewarded(cb, skip):Bool {
 		completeCB = cb;
 		skipCB = skip;
+
+		canshow = false;
 
 		try{
 			return __showRewarded(AdMob._rewardedId);
@@ -127,15 +135,21 @@ class AdMob {
 
 				switch (event)
 				{
-					case EARNED_REWARD: rewardFlag = true;
+					case LOADED:
+						canshow = true;
 
-					case LEAVING, FAILED:
+					case EARNED_REWARD:
+						rewardFlag = true;
+
+					case FAILED:
 						skipCB();
 						rewardFlag = false;
+						canshow = false;
 
 					case CLOSED:
 						rewardFlag ? completeCB() : skipCB();
 						rewardFlag = false;
+						canshow = false;
 				}
 
 				onRewardedEvent(event, item);
