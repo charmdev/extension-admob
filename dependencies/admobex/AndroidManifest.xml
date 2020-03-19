@@ -6,6 +6,6 @@
 			android:theme="@android:style/Theme.Translucent" />
 		<meta-data
 			android:name="com.google.android.gms.ads.APPLICATION_ID"
-			android:value="ca-app-pub-XXXX"/>
+			android:value="::ENV_ADMOB_APPID::"/>
 	</application>
 </manifest>
