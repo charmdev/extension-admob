@@ -95,6 +95,7 @@ public class AdMobEx extends Extension {
 
 					public void onRewardedAdFailedToShow(int errorcode) {
 						AdMobEx.getInstance().failRewarded = true;
+						AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
 						reportRewardedEvent(AdMobEx.FAILED);
 						Log.d("AdMobEx", "Fail to get Rewarded: " + errorcode);
 					}
@@ -163,6 +164,7 @@ public class AdMobEx extends Extension {
 			public void onRewardedAdFailedToLoad(int errorCode) {
 				AdMobEx.getInstance().loadingRewarded=false;
 				AdMobEx.getInstance().failRewarded=true;
+				AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
 				reportRewardedEvent(AdMobEx.FAILED);
 				Log.d("AdMobEx","Fail to get Rewarded: "+errorCode);
 			}
