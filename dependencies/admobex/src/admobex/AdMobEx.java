@@ -16,6 +16,8 @@ import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.opengl.GLSurfaceView;
+
 public class AdMobEx extends Extension {
 
 	private RewardedAd rewarded;
@@ -61,8 +63,12 @@ public class AdMobEx extends Extension {
 	}
 	private static void reportRewardedEvent(final String event, final String data){
 		if(callback == null) return;
-		mainActivity.runOnUiThread(new Runnable() {
+		
+		if (Extension.mainView == null) return;
+		GLSurfaceView view = (GLSurfaceView) Extension.mainView;
+		view.queueEvent(new Runnable() {
 			public void run() {
+
 				callback.call2("_onRewardedEvent", event, data);
 			}
 		});
