@@ -64,9 +64,7 @@ public class AdMobEx extends Extension {
 	private static void reportRewardedEvent(final String event, final String data){
 		if(callback == null) return;
 		
-		if (Extension.mainView == null) return;
-		GLSurfaceView view = (GLSurfaceView) Extension.mainView;
-		view.queueEvent(new Runnable() {
+		mainActivity.runOnUiThread(new Runnable() {
 			public void run() {
 
 				callback.call2("_onRewardedEvent", event, data);
@@ -75,26 +73,28 @@ public class AdMobEx extends Extension {
 	}
 
 	public static boolean showRewarded(final String rewardedId) {
-		Log.d("AdMobEx","Show Rewarded: Begins " + rewardedId);
+		Log.d("AdMobEx showRewarded","Show Rewarded: Begins " + rewardedId);
 
 		if(loadingRewarded) return false;
 		if(failRewarded){
 			mainActivity.runOnUiThread(new Runnable() {
 				public void run() { getInstance().reloadRewarded(AdMobEx.rewardedId);}
 			});
-			Log.d("AdMobEx","Show Rewarded: Rewarded not loaded... reloading.");
+			Log.d("AdMobEx showRewarded","Show Rewarded: Rewarded not loaded... reloading.");
 			return false;
 		}
 
 		if(AdMobEx.rewardedId=="") {
-			Log.d("AdMobEx","Show Rewarded: RewardedID is empty... ignoring.");
+			Log.d("AdMobEx showRewarded","Show Rewarded: RewardedID is empty... ignoring.");
 			return false;
 		}
 		mainActivity.runOnUiThread(new Runnable() {
 			public void run() {
-				if(!getInstance().rewarded.isLoaded()){
+
+				if(!getInstance().rewarded.isLoaded())
+				{
 					reportRewardedEvent(AdMobEx.FAILED);
-					Log.d("AdMobEx","Show Rewarded: Not loaded (THIS SHOULD NEVER BE THE CASE HERE!)... ignoring.");
+					Log.d("AdMobEx showRewarded","Show Rewarded: Not loaded (THIS SHOULD NEVER BE THE CASE HERE!)... ignoring.");
 					return;
 				}
 				RewardedAdCallback rewardedCallback = new RewardedAdCallback() {
