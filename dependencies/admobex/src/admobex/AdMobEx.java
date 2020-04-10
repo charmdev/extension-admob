@@ -18,6 +18,12 @@ import java.util.Map;
 
 import android.opengl.GLSurfaceView;
 
+import android.os.Handler;
+
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
 public class AdMobEx extends Extension {
 
 	private RewardedAd rewarded;
@@ -46,13 +52,16 @@ public class AdMobEx extends Extension {
 		return instance;
 	}
 
-	public static void init(String rewardedId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback){
-		
+	public static void init(String rewardedId, String appId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback){
 		AdMobEx.rewardedId=rewardedId;
 		AdMobEx.testingAds=testingAds;
 		AdMobEx.callback=callback;
 		AdMobEx.tagForChildDirectedTreatment=tagForChildDirectedTreatment;
+
+		Log.d("AdMobEx MobileAds","appid " + appId);
 		
+		MobileAds.initialize(mainActivity.getApplicationContext(), appId);
+
 		mainActivity.runOnUiThread(new Runnable() {
 			public void run() { getInstance(); }
 		});
@@ -103,15 +112,29 @@ public class AdMobEx extends Extension {
 
 					public void onRewardedAdFailedToShow(int errorcode) {
 						AdMobEx.getInstance().failRewarded = true;
-						AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+
 						reportRewardedEvent(AdMobEx.FAILED);
 						Log.d("AdMobEx", "Fail to get Rewarded: " + errorcode);
+
+						new Handler().postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+							}
+						}, 5000);
 					}
 
 					public void onRewardedAdClosed() {
-						AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+
 						reportRewardedEvent(AdMobEx.CLOSED);
 						Log.d("AdMobEx", "Dismiss Rewarded");
+
+						new Handler().postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+							}
+						}, 5000);
 					}
 
 					public void onRewardedAdOpened() {
@@ -141,9 +164,9 @@ public class AdMobEx extends Extension {
 			String deviceId = md5(android_id).toUpperCase();
 			Log.d("AdMobEx","DEVICE ID: " + deviceId);
 			builder.addTestDevice(deviceId);
+			builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
 		}
-
-		builder.addTestDevice(AdRequest.DEVICE_ID_EMULATOR);
+		
 		if(tagForChildDirectedTreatment){
 			Log.d("AdMobEx","Enabling COPPA support.");
 			builder.tagForChildDirectedTreatment(true);
@@ -172,9 +195,16 @@ public class AdMobEx extends Extension {
 			public void onRewardedAdFailedToLoad(int errorCode) {
 				AdMobEx.getInstance().loadingRewarded=false;
 				AdMobEx.getInstance().failRewarded=true;
-				AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+
 				reportRewardedEvent(AdMobEx.FAILED);
 				Log.d("AdMobEx","Fail to get Rewarded: "+errorCode);
+
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+					}
+				}, 5000);
 			}
 		};
 		rewarded.loadAd(adReq, adLoadCallback);

@@ -17,14 +17,15 @@ class AdMob {
 
 	private static var __initIos:String->String->Array<String>->String->Bool->Bool->Dynamic->Dynamic->Void = function(bannerId:String, interstitialId:String, rewardedIds:Array<String>, gravityMode:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic, callback2:Dynamic){};
 
-	private static var __initAndroid:String->Bool->Bool->Dynamic->Void = function(rewardedId:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic){};
+	private static var __initAndroid:String->String->Bool->Bool->Dynamic->Void = function(rewardedId:String, appId:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic){};
 
 	private static var __showRewarded:String->Bool = function(rewardedId:String){ return false; };
 
-	private static var completeCB;
-	private static var skipCB;
+	private static var completeCB:Void->Void;
+	private static var skipCB:Void->Void;
 	private static var rewardFlag:Bool;
 	private static var _rewardedId:String;
+	private static var _appId:String;
 	private static var canshow:Bool = false;
 
 	public static function canShowAds():Bool {
@@ -72,18 +73,19 @@ class AdMob {
 		testingAds = true;
 	}
 
-	public static function init(rewardedId:String){
+	public static function init(rewardedId:String, appId:String){
 
 		AdMob._rewardedId = rewardedId;
+		AdMob._appId = appId;
 
 		if (initialized) return;
 		initialized = true;
 
 		#if android
 		try{
-			__initAndroid = JNI.createStaticMethod("admobex/AdMobEx", "init", "(Ljava/lang/String;ZZLorg/haxe/lime/HaxeObject;)V");
+			__initAndroid = JNI.createStaticMethod("admobex/AdMobEx", "init", "(Ljava/lang/String;Ljava/lang/String;ZZLorg/haxe/lime/HaxeObject;)V");
 			__showRewarded = JNI.createStaticMethod("admobex/AdMobEx", "showRewarded", "(Ljava/lang/String;)Z");
-			__initAndroid(rewardedId, testingAds, childDirected, getInstance());
+			__initAndroid(rewardedId, appId, testingAds, childDirected, getInstance());
 		}catch(e:Dynamic){
 			trace("Android INIT Exception: "+e);
 		}
