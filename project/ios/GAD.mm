@@ -96,16 +96,12 @@ GADRequest *_admobexGetGADRequest(){
 - (void)rewardedAd:(GADRewardedAd *)rewardedAd didFailToPresentWithError:(NSError *)error {
     NSLog(@"rewardedDidFailToPresentWithError: %@", [error localizedDescription]);
     reportRewardedEvent(ADMOB_FAILED, nil);
-
-    [self initWithID:adId];
 }
 
 /// Tells the delegate that the rewarded ad was dismissed.
 - (void)rewardedAdDidDismiss:(GADRewardedAd *)rewardedAd {
     NSLog(@"rewardedDidDismiss");
     reportRewardedEvent(ADMOB_CLOSED, nil);
-
-    [self initWithID:adId];
 }
 
 @end
