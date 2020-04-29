@@ -61,7 +61,7 @@ GADRequest *_admobexGetGADRequest(){
     GADRequest *request = _admobexGetGADRequest();
     [ad loadRequest:request completionHandler:^(GADRequestError * _Nullable error) {
         if (error) {
-            NSLog(@"rewardedDidFailToReceiveAdWithError: %@", [error localizedDescription]);
+            //NSLog(@"rewardedDidFailToReceiveAdWithError: %@", [error localizedDescription]);
             reportRewardedEvent(ADMOB_FAILED, nil);
         } else {
             NSLog(@"rewardedDidReceiveAd");
@@ -94,7 +94,7 @@ GADRequest *_admobexGetGADRequest(){
 
 /// Tells the delegate that the rewarded ad failed to present.
 - (void)rewardedAd:(GADRewardedAd *)rewardedAd didFailToPresentWithError:(NSError *)error {
-    NSLog(@"rewardedDidFailToPresentWithError: %@", [error localizedDescription]);
+    //NSLog(@"rewardedDidFailToPresentWithError: %@", [error localizedDescription]);
     reportRewardedEvent(ADMOB_FAILED, nil);
 }
 
