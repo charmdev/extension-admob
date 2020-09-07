@@ -21,7 +21,7 @@
 		<dependency path="frameworks/GoogleAppMeasurement.framework" />
 		<dependency path="frameworks/GoogleUtilities.framework" />
 		<dependency path="frameworks/nanopb.framework" />
-		<template path="templates" />
+
 		<config:ios linker-flags="-ObjC"/>
 	</section>
 </extension>
