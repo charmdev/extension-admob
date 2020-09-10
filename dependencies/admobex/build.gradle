@@ -14,6 +14,6 @@ android {
 
 dependencies {
 	implementation project(':deps:extension-api')
-	implementation "com.crashlytics.sdk.android:crashlytics:${rootProject.ext.playServicesGamesVersion}"
+	implementation "com.google.android.gms:play-services-ads:${rootProject.ext.playServicesGamesVersion}"
 
 }
