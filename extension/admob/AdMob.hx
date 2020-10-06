@@ -13,7 +13,6 @@ class AdMob {
 
 	private static var initialized:Bool=false;
 	private static var testingAds:Bool=false;
-	private static var childDirected:Bool=false;
 
 	private static var __initIos:String->String->Array<String>->String->Bool->Bool->Dynamic->Dynamic->Void = function(bannerId:String, interstitialId:String, rewardedIds:Array<String>, gravityMode:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic, callback2:Dynamic){};
 
@@ -46,19 +45,6 @@ class AdMob {
 		}
 		return false;
 	}
-
-	public static function tagForChildDirectedTreatment(){
-		if ( childDirected ) return;
-		if ( initialized ) {
-			var msg:String;
-			msg = "FATAL ERROR: If you want to set tagForChildDirectedTreatment, you must enable them before calling INIT!.\n";
-			msg+= "Throwing an exception to avoid displaying ads withtou tagForChildDirectedTreatment.";
-			trace(msg);
-			throw msg;
-			return;
-		}
-		childDirected = true;		
-	}
 	
 	public static function enableTestingAds() {
 		if ( testingAds ) return;
@@ -85,7 +71,7 @@ class AdMob {
 		try{
 			__initAndroid = JNI.createStaticMethod("admobex/AdMobEx", "init", "(Ljava/lang/String;Ljava/lang/String;ZZLorg/haxe/lime/HaxeObject;)V");
 			__showRewarded = JNI.createStaticMethod("admobex/AdMobEx", "showRewarded", "(Ljava/lang/String;)Z");
-			__initAndroid(rewardedId, appId, testingAds, childDirected, getInstance());
+			__initAndroid(rewardedId, appId, testingAds, false, getInstance());
 		}catch(e:Dynamic){
 			trace("Android INIT Exception: "+e);
 		}
@@ -93,7 +79,7 @@ class AdMob {
 		try{
 			__initIos = cpp.Lib.load("adMobEx","admobex_init",8);
 			__showRewarded = cpp.Lib.load("adMobEx","admobex_rewarded_show",1);
-			__initIos("","",[rewardedId],"",testingAds, childDirected, getInstance()._onEvent, getInstance()._onRewardedEvent);
+			__initIos("","",[rewardedId],"",testingAds, false, getInstance()._onEvent, getInstance()._onRewardedEvent);
 		}catch(e:Dynamic){
 			trace("iOS INIT Exception: "+e);
 		}

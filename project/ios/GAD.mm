@@ -18,7 +18,7 @@ static bool _admobexChildDirected;
 GADRequest *_admobexGetGADRequest(){
 	GADRequest *request = [GADRequest request];
 	
-	return request;        
+	return request;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,8 +26,8 @@ GADRequest *_admobexGetGADRequest(){
 
 @interface RewardedListener : NSObject <GADRewardedAdDelegate> {
 	@public
-	GADRewardedAd         *ad;
-	NSString              *adId;
+	GADRewardedAd *ad;
+	NSString *adId;
 }
 
 - (id)initWithID:(NSString*)ID;
