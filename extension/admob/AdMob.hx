@@ -123,6 +123,9 @@ class AdMob {
 
 				switch (event)
 				{
+					case LOADING:
+						canshow = false;
+
 					case LOADED:
 						canshow = true;
 
@@ -137,7 +140,6 @@ class AdMob {
 					case CLOSED:
 						rewardFlag ? completeCB() : skipCB();
 						rewardFlag = false;
-						canshow = false;
 				}
 
 				onRewardedEvent(event, item);
