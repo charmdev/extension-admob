@@ -16,7 +16,7 @@ class AdMob {
 
 	private static var __initIos:String->String->Array<String>->String->Bool->Bool->Dynamic->Dynamic->Void = function(bannerId:String, interstitialId:String, rewardedIds:Array<String>, gravityMode:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic, callback2:Dynamic){};
 
-	private static var __initAndroid:String->String->Bool->Bool->Dynamic->Void = function(rewardedId:String, appId:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic){};
+	private static var __initAndroid:String->String->Bool->Bool->Dynamic->Bool->Void = function(rewardedId:String, appId:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic, initMobileAds:Bool){};
 
 	private static var __showRewarded:String->Bool = function(rewardedId:String){ return false; };
 
@@ -59,7 +59,7 @@ class AdMob {
 		testingAds = true;
 	}
 
-	public static function init(rewardedId:String, appId:String){
+	public static function init(rewardedId:String, appId:String, initMobileAds:Bool = true){
 
 		AdMob._rewardedId = rewardedId;
 		AdMob._appId = appId;
@@ -69,9 +69,9 @@ class AdMob {
 
 		#if android
 		try{
-			__initAndroid = JNI.createStaticMethod("admobex/AdMobEx", "init", "(Ljava/lang/String;Ljava/lang/String;ZZLorg/haxe/lime/HaxeObject;)V");
+			__initAndroid = JNI.createStaticMethod("admobex/AdMobEx", "init", "(Ljava/lang/String;Ljava/lang/String;ZZLorg/haxe/lime/HaxeObject;Z)V");
 			__showRewarded = JNI.createStaticMethod("admobex/AdMobEx", "showRewarded", "(Ljava/lang/String;)Z");
-			__initAndroid(rewardedId, appId, testingAds, false, getInstance());
+			__initAndroid(rewardedId, appId, testingAds, false, getInstance(), initMobileAds);
 		}catch(e:Dynamic){
 			trace("Android INIT Exception: "+e);
 		}

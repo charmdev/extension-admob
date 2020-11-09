@@ -52,7 +52,7 @@ public class AdMobEx extends Extension {
 		return instance;
 	}
 
-	public static void init(String rewardedId, String appId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback){
+	public static void init(String rewardedId, String appId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback, boolean initMobileAds){
 		AdMobEx.rewardedId=rewardedId;
 		AdMobEx.testingAds=testingAds;
 		AdMobEx.callback=callback;
@@ -60,7 +60,8 @@ public class AdMobEx extends Extension {
 
 		Log.d("AdMobEx MobileAds","appid " + appId);
 		
-		MobileAds.initialize(mainActivity.getApplicationContext(), appId);
+		if (initMobileAds)
+			MobileAds.initialize(mainActivity.getApplicationContext(), appId);
 
 		mainActivity.runOnUiThread(new Runnable() {
 			public void run() { getInstance(); }
