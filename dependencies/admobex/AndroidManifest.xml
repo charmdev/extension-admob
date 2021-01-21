@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.admobex">
 	<application>
 		<activity android:name="com.google.android.gms.ads.AdActivity"
-				  android:hardwareAccelerated="false"/>
+				  android:hardwareAccelerated="@bool/hasHardwareAcceleration"/>
 
 		<meta-data
 			android:name="com.google.android.gms.ads.APPLICATION_ID"
