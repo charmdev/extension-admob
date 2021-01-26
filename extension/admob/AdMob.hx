@@ -20,6 +20,8 @@ class AdMob {
 
 	private static var __showRewarded:String->Bool = function(rewardedId:String){ return false; };
 
+	private static var __checkAndroidVer:Void->Bool = function():Bool { return false; };
+
 	private static var completeCB:Void->Void;
 	private static var skipCB:Void->Void;
 	private static var rewardFlag:Bool;
@@ -71,7 +73,16 @@ class AdMob {
 		try{
 			__initAndroid = JNI.createStaticMethod("admobex/AdMobEx", "init", "(Ljava/lang/String;Ljava/lang/String;ZZLorg/haxe/lime/HaxeObject;Z)V");
 			__showRewarded = JNI.createStaticMethod("admobex/AdMobEx", "showRewarded", "(Ljava/lang/String;)Z");
-			__initAndroid(rewardedId, appId, testingAds, false, getInstance(), initMobileAds);
+			__checkAndroidVer = JNI.createStaticMethod("admobex/AdMobEx", "isAndroidVersionGreaterThan6_0", "()Z");
+
+			if (__checkAndroidVer())
+			{
+				trace("checkAndroidVer >= api 23");
+				__initAndroid(rewardedId, appId, testingAds, false, getInstance(), initMobileAds);
+			}
+			else
+				trace("checkAndroidVer < api 23");
+		
 		}catch(e:Dynamic){
 			trace("Android INIT Exception: "+e);
 		}
