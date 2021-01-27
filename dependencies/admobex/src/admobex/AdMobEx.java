@@ -58,10 +58,6 @@ public class AdMobEx extends Extension {
 		return instance;
 	}
 
-	public static boolean isAndroidVersionGreaterThan6_0() {
-		return android.os.Build.VERSION.SDK_INT >= 23;
-	}
-
 	public static void init(String rewardedId, String appId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback, boolean initMobileAds){
 		AdMobEx.rewardedId=rewardedId;
 		AdMobEx.testingAds=testingAds;
