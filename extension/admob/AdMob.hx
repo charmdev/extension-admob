@@ -4,17 +4,12 @@ import haxe.Json;
 import nme.Lib;
 import nme.JNI;
 
-typedef RewardItem = {
-    var type:String;
-    var amount:Int;
-}
-
 class AdMob {
 
 	private static var initialized:Bool=false;
 	private static var testingAds:Bool=false;
-
-	private static var __initIos:String->String->Array<String>->String->Bool->Bool->Dynamic->Dynamic->Void = function(bannerId:String, interstitialId:String, rewardedIds:Array<String>, gravityMode:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic, callback2:Dynamic){};
+	
+	private static var __initIos:String->Dynamic->Void = function(rewardedId:String, callback:Dynamic){};
 
 	private static var __initAndroid:String->String->Bool->Bool->Dynamic->Bool->Void = function(rewardedId:String, appId:String, testingAds:Bool, tagForChildDirectedTreatment:Bool, callback:Dynamic, initMobileAds:Bool){};
 
@@ -77,9 +72,11 @@ class AdMob {
 		}
 		#elseif ios
 		try{
-			__initIos = cpp.Lib.load("adMobEx","admobex_init",8);
+			trace("admob try run");
+
+			__initIos = cpp.Lib.load("adMobEx","admobex_init",2);
 			__showRewarded = cpp.Lib.load("adMobEx","admobex_rewarded_show",1);
-			__initIos("","",[rewardedId],"",testingAds, false, getInstance()._onEvent, getInstance()._onRewardedEvent);
+			__initIos(rewardedId, getInstance()._onRewardedEvent);
 		}catch(e:Dynamic){
 			trace("iOS INIT Exception: "+e);
 		}
@@ -97,10 +94,11 @@ class AdMob {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	public static var onRewardedEvent:String->RewardItem->Void = null;
+	public static var onRewardedEvent:String->Void = null;
 	private static var instance:AdMob = null;
 
-	private static function getInstance():AdMob{
+	private static function getInstance():AdMob
+	{
 		if (instance == null) instance = new AdMob();
 		return instance;
 	}
@@ -109,16 +107,12 @@ class AdMob {
 
 	private function new(){}
 
-	public function _onEvent(event:String){
-		
-	}
-
-	public function _onRewardedEvent(event:String, ?data:String){
-		if(onRewardedEvent != null) {
-			try{
-				var item:RewardItem = null;
-				if(data != null) item = Json.parse(data);
-
+	public function _onRewardedEvent(event:String, ?data:String)
+		{
+		if (onRewardedEvent != null)
+		{
+			try
+			{
 				trace("onRewardedEvent", event);
 
 				switch (event)
@@ -142,10 +136,11 @@ class AdMob {
 						rewardFlag = false;
 				}
 
-				onRewardedEvent(event, item);
+				onRewardedEvent(event);
 			}
-			catch(err:Dynamic){
-				trace("ERROR PARSING ", data, " err : ", err);
+			catch(err:Dynamic)
+			{
+				trace("ERROR PARSING err : ", err);
 			}
 		}
 		else trace("Rewarded event: "+event+ " (assign AdMob.onRewardedEvent to get this events and avoid this traces)");

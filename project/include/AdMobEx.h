@@ -4,13 +4,9 @@
 #ifndef ADMOBEX_H
 #define ADMOBEX_H
 
-
 namespace admobex {
-
-	void init(const char *BannerID, const char *InterstitialID, std::vector<std::string> &rewardedIDs, const char *gravityMode, bool testingAds, bool tagForChildDirectedTreatment);
-	
+	void init(const char* rewarded_id);
 	bool showRewarded(const char* rewarded_id);
-
 }
 
 #endif
