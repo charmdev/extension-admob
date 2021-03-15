@@ -76,11 +76,8 @@ public class AdMobEx extends Extension {
 			});
 		}
 	}
-
+	
 	private static void reportRewardedEvent(final String event){
-		reportRewardedEvent(event, null);
-	}
-	private static void reportRewardedEvent(final String event, final String data){
 		if(callback == null) return;
 		
 		if (Extension.mainView == null) return;
@@ -88,7 +85,7 @@ public class AdMobEx extends Extension {
 		GLSurfaceView view = (GLSurfaceView) Extension.mainView;
 		view.queueEvent(new Runnable() {
 			public void run() {
-				callback.call2("_onRewardedEvent", event, data);
+				callback.call1("_onRewardedEvent", event);
 			}
 		});
 	}
@@ -146,9 +143,8 @@ public class AdMobEx extends Extension {
 					}
 
 					public void onUserEarnedReward(final RewardItem reward) {
-						String data = "{\"type\": \"" + reward.getType() + "\", \"amount\": \"" + reward.getAmount() +"\"}";
-						reportRewardedEvent(AdMobEx.EARNED_REWARD, data);
-						Log.d("AdMobEx", "User earned reward " + data);
+						reportRewardedEvent(AdMobEx.EARNED_REWARD);
+						Log.d("AdMobEx", "User earned reward");
 					}
 				};
 

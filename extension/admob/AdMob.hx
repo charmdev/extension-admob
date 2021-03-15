@@ -107,7 +107,7 @@ class AdMob {
 
 	private function new(){}
 
-	public function _onRewardedEvent(event:String, ?data:String)
+	public function _onRewardedEvent(event:String)
 		{
 		if (onRewardedEvent != null)
 		{
