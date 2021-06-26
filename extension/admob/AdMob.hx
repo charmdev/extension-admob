@@ -15,7 +15,6 @@ class AdMob {
 
 	private static var __showRewarded:String->Bool = function(rewardedId:String){ return false; };
 
-	private static var startCB:Void->Void;
 	private static var completeCB:Void->Void;
 	private static var skipCB:Void->Void;
 	private static var rewardFlag:Bool;
@@ -28,8 +27,7 @@ class AdMob {
 		return canshow;
 	}
 
-	public static function showRewarded(cb, skip, start):Bool {
-		startCB = start;
+	public static function showRewarded(cb, skip):Bool {
 		completeCB = cb;
 		skipCB = skip;
 
@@ -119,9 +117,6 @@ class AdMob {
 
 				switch (event)
 				{
-					case DISPLAYING:
-						startCB();
-
 					case LOADING:
 						canshow = false;
 
