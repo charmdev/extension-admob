@@ -107,10 +107,10 @@ class AdMob {
 
 	////////////////////////////////////////////////////////////////////////////
 
-	private function new(){}
+	private function new() {}
 
 	public function _onRewardedEvent(event:String)
-		{
+	{
 		if (onRewardedEvent != null)
 		{
 			try
@@ -132,12 +132,30 @@ class AdMob {
 						rewardFlag = true;
 
 					case FAILED:
-						skipCB();
+						if (skipCB != null)
+							skipCB();
+
+						completeCB = null;
+						skipCB = null;
+
 						rewardFlag = false;
 						canshow = false;
 
 					case CLOSED:
-						rewardFlag ? completeCB() : skipCB();
+						if (rewardFlag)
+						{
+							if (completeCB != null)
+								completeCB();
+						}
+						else
+						{
+							if (skipCB != null)
+								skipCB();
+						}
+
+						completeCB = null;
+						skipCB = null;
+						
 						rewardFlag = false;
 				}
 
@@ -148,7 +166,7 @@ class AdMob {
 				trace("ERROR PARSING err : ", err);
 			}
 		}
-		else trace("Rewarded event: "+event+ " (assign AdMob.onRewardedEvent to get this events and avoid this traces)");
+		else trace("Rewarded event: "+ event + " (assign AdMob.onRewardedEvent to get this events and avoid this traces)");
 	}
 	
 }

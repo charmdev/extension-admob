@@ -6,8 +6,9 @@ import com.google.android.gms.ads.AdRequest;
 
 import com.google.android.gms.ads.rewarded.RewardItem;
 import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdCallback;
+import com.google.android.gms.ads.OnUserEarnedRewardListener;
 import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
+import com.google.android.gms.ads.FullScreenContentCallback;
 
 import org.haxe.extension.Extension;
 import org.haxe.lime.HaxeObject;
@@ -32,18 +33,17 @@ import com.google.android.gms.ads.RequestConfiguration;
 
 public class AdMobEx extends Extension {
 
-	private RewardedAd rewarded;
-	private AdRequest adReq;
+	private RewardedAd rewardedAd;
+	private AdRequest adRequest;
 
-	private static Boolean failRewarded=false;
-	private static Boolean loadingRewarded=false;
-	private static String rewardedId= null;
+	private static Boolean failRewarded = false;
+	private static Boolean loadingRewarded = false;
+	private static String rewardedId = null;
 
-	private static AdMobEx instance=null;
-	private static Boolean testingAds=false;
-	private static Boolean tagForChildDirectedTreatment=false;
+	private static AdMobEx instance = null;
+	private static Boolean testingAds = false;
 
-	private static HaxeObject callback=null;
+	private static HaxeObject callback = null;
 
 	public static final String LEAVING = "LEAVING";
 	public static final String FAILED = "FAILED";
@@ -53,16 +53,15 @@ public class AdMobEx extends Extension {
 	public static final String LOADING = "LOADING";
 	public static final String EARNED_REWARD = "EARNED_REWARD";
 
-	public static AdMobEx getInstance(){
-		if(instance==null) instance = new AdMobEx();
+	public static AdMobEx getInstance() {
+		if (instance == null) instance = new AdMobEx();
 		return instance;
 	}
 
-	public static void init(String rewardedId, String appId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback, boolean initMobileAds){
-		AdMobEx.rewardedId=rewardedId;
-		AdMobEx.testingAds=testingAds;
-		AdMobEx.callback=callback;
-		AdMobEx.tagForChildDirectedTreatment=tagForChildDirectedTreatment;
+	public static void init(String rewardedId, String appId, boolean testingAds, boolean tagForChildDirectedTreatment, HaxeObject callback, boolean initMobileAds) {
+		AdMobEx.rewardedId = rewardedId;
+		AdMobEx.testingAds = testingAds;
+		AdMobEx.callback = callback;
 
 		Log.d("AdMobEx MobileAds","appid " + appId);
 		
@@ -77,8 +76,8 @@ public class AdMobEx extends Extension {
 		}
 	}
 	
-	private static void reportRewardedEvent(final String event){
-		if(callback == null) return;
+	private static void reportRewardedEvent(final String event) {
+		if (callback == null) return;
 		
 		if (Extension.mainView == null) return;
 
@@ -93,8 +92,8 @@ public class AdMobEx extends Extension {
 	public static boolean showRewarded(final String rewardedId) {
 		Log.d("AdMobEx showRewarded","Show Rewarded: Begins " + rewardedId);
 
-		if(loadingRewarded) return false;
-		if(failRewarded){
+		if (loadingRewarded) return false;
+		if (failRewarded) {
 			mainActivity.runOnUiThread(new Runnable() {
 				public void run() { getInstance().reloadRewarded(AdMobEx.rewardedId);}
 			});
@@ -102,32 +101,57 @@ public class AdMobEx extends Extension {
 			return false;
 		}
 
-		if(AdMobEx.rewardedId=="") {
+		if (AdMobEx.rewardedId == "") {
 			Log.d("AdMobEx showRewarded","Show Rewarded: RewardedID is empty... ignoring.");
 			return false;
 		}
 		mainActivity.runOnUiThread(new Runnable() {
 			public void run() {
 
-				if(!getInstance().rewarded.isLoaded())
+				if (getInstance().rewardedAd == null)
 				{
 					reportRewardedEvent(AdMobEx.FAILED);
 					Log.d("AdMobEx showRewarded","Show Rewarded: Not loaded (THIS SHOULD NEVER BE THE CASE HERE!)... ignoring.");
 					return;
 				}
-				RewardedAdCallback rewardedCallback = new RewardedAdCallback() {
 
-					public void onRewardedAdFailedToShow(AdError adError) {
+				OnUserEarnedRewardListener rewardedCallback = new OnUserEarnedRewardListener() {
+
+					@Override
+					public void onUserEarnedReward(RewardItem rewardItem) {
+						
+						reportRewardedEvent(AdMobEx.EARNED_REWARD);
+							Log.d("AdMobEx", "User earned reward");
+					}
+				};
+
+				getInstance().rewardedAd.setFullScreenContentCallback(
+					new FullScreenContentCallback() {
+					@Override
+					public void onAdShowedFullScreenContent() {
+
+						reportRewardedEvent(AdMobEx.DISPLAYING);
+						Log.d("AdMobEx", "Displaying Rewarded");
+					}
+
+					@Override
+					public void onAdFailedToShowFullScreenContent(AdError adError) {
+
 						AdMobEx.getInstance().failRewarded = true;
+
+						getInstance().rewardedAd = null;
 
 						reportRewardedEvent(AdMobEx.FAILED);
 						Log.d("AdMobEx", "Fail to get Rewarded: " + adError.getCode());
 					}
 
-					public void onRewardedAdClosed() {
-
+					@Override
+					public void onAdDismissedFullScreenContent() {
+						
 						reportRewardedEvent(AdMobEx.CLOSED);
 						Log.d("AdMobEx", "Dismiss Rewarded");
+
+						getInstance().rewardedAd = null;
 
 						new Handler().postDelayed(new Runnable() {
 							@Override
@@ -136,19 +160,9 @@ public class AdMobEx extends Extension {
 							}
 						}, 5000);
 					}
+				});
 
-					public void onRewardedAdOpened() {
-						reportRewardedEvent(AdMobEx.DISPLAYING);
-						Log.d("AdMobEx", "Displaying Rewarded");
-					}
-
-					public void onUserEarnedReward(final RewardItem reward) {
-						reportRewardedEvent(AdMobEx.EARNED_REWARD);
-						Log.d("AdMobEx", "User earned reward");
-					}
-				};
-
-				getInstance().rewarded.show(mainActivity, rewardedCallback);
+				getInstance().rewardedAd.show(mainActivity, rewardedCallback);
 			}
 		});
 		Log.d("AdMobEx","Show Rewarded: end.");
@@ -156,7 +170,8 @@ public class AdMobEx extends Extension {
 	}
 
 	private AdMobEx() {
-		AdRequest.Builder builder = new AdRequest.Builder();
+
+		adRequest = new AdRequest.Builder().build();
 
 		if (testingAds) {
 			String android_id = Secure.getString(mainActivity.getContentResolver(), Secure.ANDROID_ID);
@@ -170,12 +185,6 @@ public class AdMobEx extends Extension {
 			RequestConfiguration configuration = new RequestConfiguration.Builder().setTestDeviceIds(testList).build();
 			MobileAds.setRequestConfiguration(configuration);
 		}
-		
-		if (tagForChildDirectedTreatment) {
-			Log.d("AdMobEx","Enabling COPPA support.");
-			builder.tagForChildDirectedTreatment(true);
-		}
-		adReq = builder.build();
 
 		this.reloadRewarded(rewardedId);
 	}
@@ -184,28 +193,32 @@ public class AdMobEx extends Extension {
 		if (rewardedId == "") return;
 		if (loadingRewarded) return;
 		Log.d("AdMobEx","Reload Rewarded");
-		rewarded = new RewardedAd(mainActivity, rewardedId);
+		
 		reportRewardedEvent(AdMobEx.LOADING);
-		loadingRewarded=true;
+		loadingRewarded = true;
+
 		RewardedAdLoadCallback adLoadCallback = new RewardedAdLoadCallback() {
 			@Override
-			public void onRewardedAdLoaded() {
+			public void onAdLoaded(RewardedAd rewardedAd) {
+				getInstance().rewardedAd = rewardedAd;
 				AdMobEx.getInstance().loadingRewarded = false;
 				reportRewardedEvent(AdMobEx.LOADED);
 				Log.d("AdMobEx","Received Rewarded!");
 			}
 
 			@Override
-			public void onRewardedAdFailedToLoad(LoadAdError adError) { 
+			public void onAdFailedToLoad(LoadAdError adError) { 
 				AdMobEx.getInstance().loadingRewarded = false;
 				AdMobEx.getInstance().failRewarded = true;
+
+				getInstance().rewardedAd = null;
 
 				reportRewardedEvent(AdMobEx.FAILED);
 				Log.d("AdMobEx","Fail to get Rewarded: " + adError.getCode());
 			}
 		};
-		rewarded.loadAd(adReq, adLoadCallback);
-		failRewarded=false;
+		rewardedAd.load(mainActivity, AdMobEx.rewardedId, adRequest, adLoadCallback);
+		failRewarded = false;
 	}
 
 	private static String md5(String s)  {
