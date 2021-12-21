@@ -143,6 +143,13 @@ public class AdMobEx extends Extension {
 
 						reportRewardedEvent(AdMobEx.FAILED);
 						Log.d("AdMobEx", "Fail to get Rewarded: " + adError.getCode());
+
+						new Handler().postDelayed(new Runnable() {
+							@Override
+							public void run() {
+								AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+							}
+						}, 5000);
 					}
 
 					@Override
@@ -214,7 +221,14 @@ public class AdMobEx extends Extension {
 				getInstance().rewardedAd = null;
 
 				reportRewardedEvent(AdMobEx.FAILED);
-				Log.d("AdMobEx","Fail to get Rewarded: " + adError.getCode());
+				Log.d("AdMobEx","Fail to get Rewarded : " + adError.getCode());
+
+				new Handler().postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						AdMobEx.getInstance().reloadRewarded(AdMobEx.rewardedId);
+					}
+				}, 5000);
 			}
 		};
 		rewardedAd.load(mainActivity, AdMobEx.rewardedId, adRequest, adLoadCallback);
